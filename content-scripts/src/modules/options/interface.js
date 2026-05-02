@@ -3,6 +3,18 @@ import selectors from "../../selectors";
 import addStyles, { removeStyles } from "../utilities/addStyles";
 import { getStorage } from "../utilities/storage";
 
+const normalizeHexColor = (color) => {
+  if (typeof color !== "string") return "";
+
+  const trimmedColor = color.trim();
+  if (!trimmedColor) return "";
+
+  const colorWithHash = trimmedColor.startsWith("#") ? trimmedColor : `#${trimmedColor}`;
+  if (!/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(colorWithHash)) return "";
+
+  return colorWithHash.toLowerCase();
+};
+
 // Function to change the title notification count
 let nt; // Title Notifications timeout
 export const changeTitleNotifications = (tf) => {
@@ -67,6 +79,46 @@ export const changeInterFont = (interFont) => {
       removeStyles("interFont");
       break;
   }
+};
+
+export const changeBackgroundColor = (backgroundColor) => {
+  const color = normalizeHexColor(backgroundColor);
+
+  if (!color) {
+    removeStyles("backgroundColor");
+    return;
+  }
+
+  addStyles(
+    "backgroundColor",
+    `
+    :root {
+      --mt-custom-background-color: ${color};
+      --body-bg-color: var(--mt-custom-background-color) !important;
+    }
+
+    html,
+    body,
+    #react-root,
+    #react-root > div,
+    ${selectors.mainWrapper},
+    ${selectors.mainColumn},
+    ${selectors.mainColumn} > div,
+    ${selectors.mainColumn} > div > div,
+    ${selectors.mainColumn} section,
+    ${selectors.mainColumn} [data-testid="cellInnerDiv"],
+    ${selectors.mainColumn} article[data-testid="tweet"],
+    ${selectors.mainColumn} nav[role="navigation"],
+    ${selectors.leftSidebar},
+    ${selectors.leftSidebar} > div,
+    ${selectors.leftSidebar} > div > div,
+    ${selectors.rightSidebar},
+    ${selectors.rightSidebar} > div,
+    ${selectors.rightSidebar} > div > div {
+      background-color: var(--mt-custom-background-color) !important;
+    }
+    `
+  );
 };
 
 // Function to change Tweet Button

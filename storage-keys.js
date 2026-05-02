@@ -43,6 +43,7 @@ export const KeyHideTimelineComposer = "hideTimelineComposer";
 export const KeyRecentMedia = "recentMedia";
 export const KeyTypefullyEnhancementsButtons = "typefullyEnhancementsButtons";
 export const KeyInterFont = "interFont";
+export const KeyBackgroundColor = "backgroundColor";
 export const KeyTitleNotifications = "titleNotifications";
 export const KeyCustomCss = "customCss";
 export const KeyHideViewCount = "hideViewCount";
@@ -82,6 +83,7 @@ export const allSettingsKeys = [
 
   // Interface Features
   KeyInterFont,
+  KeyBackgroundColor,
   KeySearchBar,
   KeyTransparentSearch,
   KeyTitleNotifications,
@@ -147,6 +149,7 @@ export const defaultPreferences = {
 
   // Interface Features
   [KeyInterFont]: "off",
+  [KeyBackgroundColor]: "",
   [KeySearchBar]: "on",
   [KeyTransparentSearch]: "off",
   [KeyTitleNotifications]: "on",

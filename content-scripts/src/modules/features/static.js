@@ -12,6 +12,7 @@ import {
   KeyCommunitiesButton,
   KeyCreatorStudioButton,
   KeyCustomCss,
+  KeyBackgroundColor,
   KeyExploreButton,
   KeyFollowCount,
   KeyFollowingTimeline,
@@ -57,7 +58,7 @@ import {
 import { changeCustomCss } from "../options/customCss";
 import { changeFollowingAndFollowersCounts, changeLikeCount, changeReplyCount, changeRetweetCount } from "../options/hideVanityCounts";
 import changeHideViewCounts from "../options/hideViewCount";
-import { changeHideSearchBar, changeInterFont, changeTitleNotifications, changeTransparentSearchBar, changeTweetButton } from "../options/interface";
+import { changeBackgroundColor, changeHideSearchBar, changeInterFont, changeTitleNotifications, changeTransparentSearchBar, changeTweetButton } from "../options/interface";
 import {
   changeAnalyticsButton,
   changeAccountSwitcherButton,
@@ -130,6 +131,7 @@ export const staticFeatures = {
   },
   interface: (data) => {
     changeInterFont(data[KeyInterFont]);
+    changeBackgroundColor(data[KeyBackgroundColor]);
     changeHideSearchBar(data[KeySearchBar]);
     changeTransparentSearchBar(data[KeyTransparentSearch]);
     changeTitleNotifications(data[KeyTitleNotifications]);
