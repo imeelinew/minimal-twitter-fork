@@ -20,7 +20,7 @@ let manifest = {
   name: "Minimal Twitter Fork",
   short_name: "MT Fork",
   description: "Local fork of Minimal Twitter with Eli's imported settings.",
-  version: "6.4.1",
+  version: "6.4.2",
   icons: {
     16: "images/MinimalTwitterIcon16.png",
     32: "images/MinimalTwitterIcon32.png",

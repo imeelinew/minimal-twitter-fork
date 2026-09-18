@@ -12,6 +12,9 @@ export const changeTimelineWidth = (timelineWidth) => {
   addStyles(
     "timelineWidth",
     `
+    :root {
+      --mt-timeline-width: ${width}px;
+    }
     @media only screen and (min-width: 988px) {
       ${selectors.mainColumn} {
         width: ${width}px;

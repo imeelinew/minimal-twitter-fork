@@ -184,7 +184,26 @@ export const changeNavigationButtonsLabels = async (setting) => {
     removeStyles("navigation-position");
     addStyles(
       "customDMsAndSearchStyle",
-      `
+      isSearchPage
+        ? `
+${selectors.leftSidebar} {
+  flex: 0.5 1 auto;
+}
+@media only screen and (min-width: 1000px) {
+  /* Match the centered timeline's left edge instead of X's wide navigation flex column. */
+  ${selectors.leftSidebar} {
+    flex: 0 0 max(88px, calc((100vw - var(--mt-timeline-width, 800px)) / 2));
+  }
+  ${selectors.mainColumn} {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+${selectors.mainWrapper} {
+  align-items: flex-start;
+}
+`
+        : `
 ${selectors.leftSidebar} {
 flex: 0.5 1 auto;
 }
