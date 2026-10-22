@@ -7,30 +7,20 @@
 
 import {
   KeyAccountSwitcherButton,
-  KeyArticlesButton,
-  KeyBookmarksButton,
   KeyCommunitiesButton,
-  KeyCreatorStudioButton,
   KeyCustomCss,
   KeyBackgroundColor,
-  KeyExploreButton,
   KeyFollowCount,
   KeyFollowingTimeline,
-  KeyGrokButton,
   KeyHideGrokDrawer,
   KeyHideTimelineComposer,
   KeyHideViewCount,
-  KeyHomeButton,
   KeyInterFont,
-  KeyJobsButton,
   KeyLikeCount,
   KeyListsButton,
-  KeyMessagesButton,
   KeyNavigationButtonsLabels,
   KeyNavigationCenter,
   KeyNavigationHorizontalOffset,
-  KeyNotificationsButton,
-  KeyProfileButton,
   KeyRecentMedia,
   KeyRemovePromotedPosts,
   KeyRemoveTimelineBorders,
@@ -51,37 +41,26 @@ import {
   KeyTypefullyEnhancementsButtons,
   KeyTypefullyGrowTab,
   KeyUnreadCountBadge,
-  KeyVerifiedOrgsButton,
   KeyWriterMode,
   KeyXPremiumButton,
 } from "../../../../storage-keys";
 import { changeCustomCss } from "../options/customCss";
+import { applySidebarWhitelist } from "../options/sidebarWhitelist";
 import { changeFollowingAndFollowersCounts, changeLikeCount, changeReplyCount, changeRetweetCount } from "../options/hideVanityCounts";
 import changeHideViewCounts from "../options/hideViewCount";
 import { changeBackgroundColor, changeHideSearchBar, changeInterFont, changeTitleNotifications, changeTransparentSearchBar, changeTweetButton } from "../options/interface";
 import {
-  changeAnalyticsButton,
+  addAnalyticsButton,
+  addCommunitiesButton,
+  addListsButton,
+  addTopicsButton,
+  addXPremiumButton,
   changeAccountSwitcherButton,
-  changeArticlesButton,
-  changeBookmarksButton,
-  changeCommunitiesButton,
-  changeCreatorStudioButton,
-  changeExploreButton,
-  changeGrokButton,
-  changeHomeButton,
-  changeJobsButton,
-  changeListsButton,
-  changeMessagesButton,
   changeNavigationButtonsLabels,
   changeNavigationCenter,
   changeNavigationHorizontalOffset,
-  changeNotificationsButton,
-  changeProfileButton,
   changeSidebarLogo,
-  changeTopicsButton,
   changeUnreadCountBadge,
-  changeVerifiedOrgsButton,
-  changeXPremiumButton,
   hideGrokDrawer,
 } from "../options/navigation";
 import {
@@ -138,23 +117,13 @@ export const staticFeatures = {
     changeTweetButton(data[KeyTweetButton]);
   },
   sidebar: (data) => {
-    changeHomeButton(data[KeyHomeButton]);
-    changeExploreButton(data[KeyExploreButton]);
-    changeNotificationsButton(data[KeyNotificationsButton]);
-    changeMessagesButton(data[KeyMessagesButton]);
-    changeBookmarksButton(data[KeyBookmarksButton]);
-    changeJobsButton(data[KeyJobsButton]);
-    changeCreatorStudioButton(data[KeyCreatorStudioButton]);
+    applySidebarWhitelist(data);
     changeAccountSwitcherButton(data[KeyAccountSwitcherButton]);
-    changeArticlesButton(data[KeyArticlesButton]);
-    changeCommunitiesButton(data[KeyCommunitiesButton]);
-    changeTopicsButton(data[KeyTopicsButton]);
-    changeListsButton(data[KeyListsButton]);
-    changeProfileButton(data[KeyProfileButton]);
-    changeXPremiumButton(data[KeyXPremiumButton]);
-    changeGrokButton(data[KeyGrokButton]);
-    changeVerifiedOrgsButton(data[KeyVerifiedOrgsButton]);
-    changeAnalyticsButton(data[KeyTypefullyGrowTab]);
+    if (data[KeyCommunitiesButton] === "on") addCommunitiesButton();
+    if (data[KeyTopicsButton] === "on") addTopicsButton();
+    if (data[KeyListsButton] === "on") addListsButton();
+    if (data[KeyXPremiumButton] === "on") addXPremiumButton();
+    if (data[KeyTypefullyGrowTab] === "on") addAnalyticsButton();
   },
   advanced: (data) => {
     changeCustomCss(data[KeyCustomCss]);

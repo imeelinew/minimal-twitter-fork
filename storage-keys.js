@@ -48,6 +48,10 @@ export const KeyTitleNotifications = "titleNotifications";
 export const KeyCustomCss = "customCss";
 export const KeyHideViewCount = "hideViewCount";
 export const KeyHideGrokDrawer = "hideGrokDrawer";
+export const KeyMoreButton = "moreButton";
+export const KeySidebarExtraButtons = "sidebarExtraButtons";
+// Discovered page metadata, deliberately excluded from settings exports.
+export const KeySidebarCatalog = "sidebarCatalog";
 
 export const allSettingsKeys = [
   // Extension Status
@@ -90,6 +94,8 @@ export const allSettingsKeys = [
   KeyTweetButton,
 
   // Sidebar Features
+  KeyMoreButton,
+  KeySidebarExtraButtons,
   KeyHomeButton,
   KeyExploreButton,
   KeyNotificationsButton,
@@ -156,6 +162,8 @@ export const defaultPreferences = {
   [KeyTweetButton]: "on",
 
   // Sidebar Features
+  [KeyMoreButton]: "on",
+  [KeySidebarExtraButtons]: [],
   [KeyHomeButton]: "on",
   [KeyExploreButton]: "on",
   [KeyNotificationsButton]: "on",

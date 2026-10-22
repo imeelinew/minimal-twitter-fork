@@ -48,6 +48,10 @@ const KeyTitleNotifications = "titleNotifications";
 const KeyCustomCss = "customCss";
 const KeyHideViewCount = "hideViewCount";
 const KeyHideGrokDrawer = "hideGrokDrawer";
+const KeyMoreButton = "moreButton";
+const KeySidebarExtraButtons = "sidebarExtraButtons";
+// Discovered page metadata, deliberately excluded from settings exports.
+const KeySidebarCatalog = "sidebarCatalog";
 
 const allSettingsKeys = [
   // Extension Status
@@ -90,6 +94,8 @@ const allSettingsKeys = [
   KeyTweetButton,
 
   // Sidebar Features
+  KeyMoreButton,
+  KeySidebarExtraButtons,
   KeyHomeButton,
   KeyExploreButton,
   KeyNotificationsButton,
@@ -156,6 +162,8 @@ const defaultPreferences = {
   [KeyTweetButton]: "on",
 
   // Sidebar Features
+  [KeyMoreButton]: "on",
+  [KeySidebarExtraButtons]: [],
   [KeyHomeButton]: "on",
   [KeyExploreButton]: "on",
   [KeyNotificationsButton]: "on",
@@ -193,6 +201,119 @@ const changeCustomCss = (cssText) => {
   }
 };
 
+const sidebarSettingKeys = {
+  home: KeyHomeButton,
+  explore: KeyExploreButton,
+  notifications: KeyNotificationsButton,
+  messages: KeyMessagesButton,
+  grok: KeyGrokButton,
+  xPremium: KeyXPremiumButton,
+  lists: KeyListsButton,
+  bookmarks: KeyBookmarksButton,
+  jobs: KeyJobsButton,
+  creatorStudio: KeyCreatorStudioButton,
+  communities: KeyCommunitiesButton,
+  articles: KeyArticlesButton,
+  topics: KeyTopicsButton,
+  verifiedOrgs: KeyVerifiedOrgsButton,
+  analytics: KeyTypefullyGrowTab,
+  profile: KeyProfileButton,
+  more: KeyMoreButton,
+};
+
+// Routes survive localization, active icon changes and unread count changes.
+const sidebarItemId = ({ href, testId, label }) => {
+  if (href) {
+    try {
+      const url = new URL(href, "https://x.com");
+      const host = ["x.com", "twitter.com", "mobile.twitter.com"].includes(url.hostname) ? "" : url.origin;
+      return `route:${host}${url.pathname.replace(/\/$/, "") || "/"}`;
+    } catch (_) {
+      return null;
+    }
+  }
+  return testId ? `button:${testId}` : label ? `button-label:${label}` : null;
+};
+
+const sidebarItemEnabled = (item, settings) => {
+  const key = sidebarSettingKeys[item.id];
+  if (key) return (settings[key] ?? defaultPreferences[key]) === "on";
+  const extra = settings[KeySidebarExtraButtons];
+  return Array.isArray(extra) && extra.includes(item.id);
+};
+
+const selectors = {};
+
+// Layout
+selectors.mainWrapper = `main[role="main"]`;
+selectors.mainColumn = `[data-testid="primaryColumn"]`;
+selectors.topHeader = `${selectors.mainColumn} > div > div:nth-of-type(1)`;
+selectors.timelineTabs = `${selectors.mainColumn} > div:first-child > div:first-child > div:first-child > div:only-child > nav:only-child`;
+selectors.leftSidebar = `header[role="banner"]`;
+selectors.leftSidebarLinks = `${selectors.leftSidebar} nav[role="navigation"]`;
+selectors.leftSidebarUnreadBadge = `${selectors.leftSidebarLinks} a svg + div[aria-label]:only-of-type`;
+selectors.sidebarLinks = {
+  logo: `${selectors.leftSidebar} div:first-child > div:first-child div:first-child > div:first-child > h1:only-child[role="heading"]`,
+  home: `${selectors.leftSidebar} [data-testid="AppTabBar_Home_Link"]`,
+  explore: `${selectors.leftSidebar} [data-testid="AppTabBar_Explore_Link"]`,
+  notifications: `${selectors.leftSidebar} [data-testid="AppTabBar_Notifications_Link"]`,
+  messages: `${selectors.leftSidebar} [data-testid="AppTabBar_DirectMessage_Link"], ${selectors.leftSidebar} a[href="/i/chat"], ${selectors.leftSidebar} a[href="/messages"]`,
+  bookmarks: `${selectors.leftSidebar} a[href*="bookmarks"]`,
+  jobs: `${selectors.leftSidebar} a[href*="jobs"]`,
+  creatorStudio: [
+    `${selectors.leftSidebar} a[href*="studio.x.com"][role="link"]`,
+    `${selectors.leftSidebar} a[href*="creator"][role="link"]`,
+    `${selectors.leftSidebar} a[href*="monetization"][role="link"]`,
+  ].join(", "),
+  articles: 'a[href="/compose/articles"]',
+  topics: `${selectors.leftSidebar} a[href*=topics]`,
+  circles: `${selectors.leftSidebar} a[href*=circles]`,
+  communities: `${selectors.leftSidebar} a[href*=communities]`,
+  profile: `${selectors.leftSidebar} [data-testid="AppTabBar_Profile_Link"]`,
+  lists: `${selectors.leftSidebar} a[href*="lists"][role="link"][aria-label]`,
+  xPremium: `${selectors.leftSidebar} a[href*="premium"][role="link"][aria-label]`,
+  verifiedOrgs: `${selectors.leftSidebar} a[href*="verified-orgs"][role="link"][aria-label]`,
+  analytics: `${selectors.leftSidebar} .mt-sidebar-button[aria-label="Analytics"]`,
+  grok: `${selectors.leftSidebar} a[href*="grok"][role="link"][aria-label]`,
+  more: `${selectors.leftSidebar} [data-testid="AppTabBar_More_Menu"]`,
+};
+selectors.accountSwitcherButton = `[data-testid="SideNav_AccountSwitcher_Button"]`;
+selectors.leftSidebarLabel = `${selectors.leftSidebarLinks} > * > div > div + div:last-child`;
+selectors.accountSwitcherLabel = `${selectors.accountSwitcherButton} > div:not(:first-child)`;
+selectors.leftSidebarLabel_hover = `${selectors.leftSidebarLinks}:hover > * > div > div + div:last-child`;
+selectors.accountSwitcherLabel_hover = `${selectors.accountSwitcherButton}:hover > div:not(:first-child)`;
+selectors.rightSidebar = `[data-testid="sidebarColumn"]`;
+// Add Grok drawer selector
+selectors.grokDrawer = `[data-testid="GrokDrawer"]`;
+selectors.grokDrawerHeader = `div[data-testid="GrokDrawerHeader"]`;
+// Timeline
+selectors.timelineTablist = `div[data-testid='ScrollSnap-List'][role='tablist']`;
+selectors.timelineTab = `div[role='tab']`;
+selectors.timelineTabPresentation = `div[role='presentation']`;
+selectors.timelineTabSelected = `div[role='tab'][aria-selected='true']`;
+selectors.timelineTabText = `div[dir='ltr'] > span`;
+selectors.timelineOptions = `div[aria-label='Timeline options']`;
+selectors.topTweetsOn = `div[aria-label='Top Tweets on']`;
+selectors.menuItem = `div[role='menuitem'][tabindex='0']`;
+selectors.tweetCounts = `[role="group"][id*="id__"]:only-child`;
+selectors.viewCount = selectors.tweetCounts + " a[href*='/analytics']";
+selectors.tweet = `[data-testid="tweet"][role="article"]`;
+selectors.tweetSpan = `${selectors.tweet} div > div:only-child > span:only-child > span`;
+selectors.grokSvg = 'svg:has(path[d="M12.745 20.54l10.97-8.19c.539-.4 1.307-.244 1.564.38 1.349 3.288.746 7.241-1.938 9.955-2.683 2.714-6.417 3.31-9.83 1.954l-3.728 1.745c5.347 3.697 11.84 2.782 15.898-1.324 3.219-3.255 4.216-7.692 3.284-11.693l.008.009c-1.351-5.878.332-8.227 3.782-13.031L33 0l-4.54 4.59v-.014L12.743 20.544m-2.263 1.987c-3.837-3.707-3.175-9.446.1-12.755 2.42-2.449 6.388-3.448 9.852-1.979l3.72-1.737c-.67-.49-1.53-1.017-2.515-1.387-4.455-1.854-9.789-.931-13.41 2.728-3.483 3.523-4.579 8.94-2.697 13.561 1.405 3.454-.899 5.898-3.22 8.364C1.49 30.2.666 31.074 0 32l10.478-9.466"])';
+
+// Search
+selectors.searchBox = `${selectors.rightSidebar} form[role="search"]`;
+selectors.searchBoxInput = `${selectors.searchBox} input:only-child`;
+selectors.searchListBox = `${selectors.searchBox} div[role="listbox"]`;
+// Modals
+selectors.modalExternalWrapper = `div[role="group"]`;
+selectors.modalBackground = `${selectors.modalExternalWrapper} > div:empty`;
+selectors.modalWrapper = `div[aria-labelledby="modal-header"][role="dialog"]`;
+selectors.modalUi = `${selectors.modalWrapper} > div`;
+selectors.tweetButton = `[data-testid="SideNav_NewTweet_Button"]`;
+// Settings
+selectors.securityAndAccountAccess = `[data-testid="accountAccessScreen"]`;
+
 // Utility function to remove DOM element
 function removeElementById(id) {
   const element = document.getElementById(id);
@@ -216,6 +337,78 @@ function removeStyles(id) {
 function stylesExist(id) {
   return document.getElementById("mt-style-" + id);
 }
+
+let settings = {};
+let observer;
+let saveTimer;
+let lastCatalog = "";
+
+const readItem = (element) => {
+  const svg = element.querySelector("svg");
+  if (!svg) return null;
+  const knownId = Object.keys(sidebarSettingKeys).find((id) => element.matches(selectors.sidebarLinks[id]));
+  const id = knownId || sidebarItemId({ href: element.getAttribute("href"), testId: element.getAttribute("data-testid"), label: element.getAttribute("aria-label") });
+  if (!id) return null;
+  return {
+    id,
+    label: (element.getAttribute("aria-label") || element.textContent || id).trim().slice(0, 100),
+    viewBox: svg.getAttribute("viewBox") || "0 0 24 24",
+    // Store geometry only; never inject page HTML into the settings UI.
+    paths: Array.from(svg.querySelectorAll("path")).slice(0, 32).map((path) => ({
+      d: (path.getAttribute("d") || "").slice(0, 16000),
+      fillRule: path.getAttribute("fill-rule") || "nonzero",
+      clipRule: path.getAttribute("clip-rule") || "nonzero",
+    })),
+  };
+};
+
+const refreshSidebarCatalog = () => {
+  const nav = document.querySelector(selectors.leftSidebarLinks);
+  if (!nav) return [];
+
+  const items = [];
+  for (const element of nav.children) {
+    const item = readItem(element);
+    element.toggleAttribute("data-mt-sidebar-allowed", Boolean(item && sidebarItemEnabled(item, settings)));
+    if (item && !items.some((existing) => existing.id === item.id)) items.push(item);
+  }
+
+  // Don't replace a useful cached list with a transient empty loading state.
+  const serialized = JSON.stringify(items);
+  if (items.length && serialized !== lastCatalog) {
+    lastCatalog = serialized;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      chrome.storage.local.set({ [KeySidebarCatalog]: items });
+    }, 300);
+  }
+  return items;
+};
+
+const applySidebarWhitelist = (data) => {
+  settings = data;
+  if (!observer) {
+    // New server-provided children stay hidden even before the observer runs.
+    addStyles("sidebarWhitelist", `${selectors.leftSidebarLinks} > :not([data-mt-sidebar-allowed]) { display: none !important; }`);
+    observer = new MutationObserver((mutations) => {
+      if (mutations.some(({ target, addedNodes, removedNodes }) =>
+        target.parentElement?.closest(selectors.leftSidebar) ||
+        target.matches?.(selectors.leftSidebar) ||
+        [...addedNodes, ...removedNodes].some((node) => node.matches?.(selectors.leftSidebar) || node.querySelector?.(selectors.leftSidebarLinks))
+      )) refreshSidebarCatalog();
+    });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["href", "aria-label", "data-testid", "d", "viewBox"],
+    });
+    chrome.runtime.onMessage.addListener((message, _sender, respond) => {
+      if (message?.type === "mt-refresh-sidebar") respond(refreshSidebarCatalog());
+    });
+  }
+  refreshSidebarCatalog();
+};
 
 const changeReplyCount = (replyCount) => {
   switch (replyCount) {
@@ -290,77 +483,6 @@ const changeFollowingAndFollowersCounts = (followCount) => {
       break;
   }
 };
-
-const selectors = {};
-
-// Layout
-selectors.mainWrapper = `main[role="main"]`;
-selectors.mainColumn = `[data-testid="primaryColumn"]`;
-selectors.topHeader = `${selectors.mainColumn} > div > div:nth-of-type(1)`;
-selectors.timelineTabs = `${selectors.mainColumn} > div:first-child > div:first-child > div:first-child > div:only-child > nav:only-child`;
-selectors.leftSidebar = `header[role="banner"]`;
-selectors.leftSidebarLinks = `${selectors.leftSidebar} nav[role="navigation"]`;
-selectors.leftSidebarUnreadBadge = `${selectors.leftSidebarLinks} a svg + div[aria-label]:only-of-type`;
-selectors.sidebarLinks = {
-  logo: `${selectors.leftSidebar} div:first-child > div:first-child div:first-child > div:first-child > h1:only-child[role="heading"]`,
-  home: `${selectors.leftSidebar} [data-testid="AppTabBar_Home_Link"]`,
-  explore: `${selectors.leftSidebar} [data-testid="AppTabBar_Explore_Link"]`,
-  notifications: `${selectors.leftSidebar} [data-testid="AppTabBar_Notifications_Link"]`,
-  messages: `${selectors.leftSidebar} [data-testid="AppTabBar_DirectMessage_Link"]`,
-  bookmarks: `${selectors.leftSidebar} a[href*="bookmarks"]`,
-  jobs: `${selectors.leftSidebar} a[href*="jobs"]`,
-  creatorStudio: [
-    `${selectors.leftSidebar} a[href*="studio.x.com"][role="link"]`,
-    `${selectors.leftSidebar} a[href*="creator"][role="link"]`,
-    `${selectors.leftSidebar} a[href*="monetization"][role="link"]`,
-  ].join(", "),
-  articles: 'a[href="/compose/articles"]',
-  topics: `${selectors.leftSidebar} a[href*=topics]`,
-  circles: `${selectors.leftSidebar} a[href*=circles]`,
-  communities: `${selectors.leftSidebar} a[href*=communities]`,
-  profile: `${selectors.leftSidebar} [data-testid="AppTabBar_Profile_Link"]`,
-  lists: `${selectors.leftSidebar} a[href*="lists"][role="link"][aria-label]`,
-  xPremium: `${selectors.leftSidebar} a[href*="premium"][role="link"][aria-label]`,
-  verifiedOrgs: `${selectors.leftSidebar} a[href*="verified-orgs"][role="link"][aria-label]`,
-  analytics: `${selectors.leftSidebar} .mt-sidebar-button[aria-label="Analytics"]`,
-  grok: `${selectors.leftSidebar} a[href*="grok"][role="link"][aria-label]`,
-};
-selectors.accountSwitcherButton = `[data-testid="SideNav_AccountSwitcher_Button"]`;
-selectors.leftSidebarLabel = `${selectors.leftSidebarLinks} > * > div > div + div:last-child`;
-selectors.accountSwitcherLabel = `${selectors.accountSwitcherButton} > div:not(:first-child)`;
-selectors.leftSidebarLabel_hover = `${selectors.leftSidebarLinks}:hover > * > div > div + div:last-child`;
-selectors.accountSwitcherLabel_hover = `${selectors.accountSwitcherButton}:hover > div:not(:first-child)`;
-selectors.rightSidebar = `[data-testid="sidebarColumn"]`;
-// Add Grok drawer selector
-selectors.grokDrawer = `[data-testid="GrokDrawer"]`;
-selectors.grokDrawerHeader = `div[data-testid="GrokDrawerHeader"]`;
-// Timeline
-selectors.timelineTablist = `div[data-testid='ScrollSnap-List'][role='tablist']`;
-selectors.timelineTab = `div[role='tab']`;
-selectors.timelineTabPresentation = `div[role='presentation']`;
-selectors.timelineTabSelected = `div[role='tab'][aria-selected='true']`;
-selectors.timelineTabText = `div[dir='ltr'] > span`;
-selectors.timelineOptions = `div[aria-label='Timeline options']`;
-selectors.topTweetsOn = `div[aria-label='Top Tweets on']`;
-selectors.menuItem = `div[role='menuitem'][tabindex='0']`;
-selectors.tweetCounts = `[role="group"][id*="id__"]:only-child`;
-selectors.viewCount = selectors.tweetCounts + " a[href*='/analytics']";
-selectors.tweet = `[data-testid="tweet"][role="article"]`;
-selectors.tweetSpan = `${selectors.tweet} div > div:only-child > span:only-child > span`;
-selectors.grokSvg = 'svg:has(path[d="M12.745 20.54l10.97-8.19c.539-.4 1.307-.244 1.564.38 1.349 3.288.746 7.241-1.938 9.955-2.683 2.714-6.417 3.31-9.83 1.954l-3.728 1.745c5.347 3.697 11.84 2.782 15.898-1.324 3.219-3.255 4.216-7.692 3.284-11.693l.008.009c-1.351-5.878.332-8.227 3.782-13.031L33 0l-4.54 4.59v-.014L12.743 20.544m-2.263 1.987c-3.837-3.707-3.175-9.446.1-12.755 2.42-2.449 6.388-3.448 9.852-1.979l3.72-1.737c-.67-.49-1.53-1.017-2.515-1.387-4.455-1.854-9.789-.931-13.41 2.728-3.483 3.523-4.579 8.94-2.697 13.561 1.405 3.454-.899 5.898-3.22 8.364C1.49 30.2.666 31.074 0 32l10.478-9.466"])';
-
-// Search
-selectors.searchBox = `${selectors.rightSidebar} form[role="search"]`;
-selectors.searchBoxInput = `${selectors.searchBox} input:only-child`;
-selectors.searchListBox = `${selectors.searchBox} div[role="listbox"]`;
-// Modals
-selectors.modalExternalWrapper = `div[role="group"]`;
-selectors.modalBackground = `${selectors.modalExternalWrapper} > div:empty`;
-selectors.modalWrapper = `div[aria-labelledby="modal-header"][role="dialog"]`;
-selectors.modalUi = `${selectors.modalWrapper} > div`;
-selectors.tweetButton = `[data-testid="SideNav_NewTweet_Button"]`;
-// Settings
-selectors.securityAndAccountAccess = `[data-testid="accountAccessScreen"]`;
 
 async function changeHideViewCounts(setting) {
   const viewCounts = Array.from(document.querySelectorAll(selectors.viewCount));
@@ -758,7 +880,7 @@ const createNewElement = ({ profileNode, name, href, userHref, onClick, svgAsset
 
 // Utilities
 
-const changeSidebarSetting = (sidebarSelector, state, onAdd) => {
+const changeSidebarSetting = (sidebarSelector, state) => {
   switch (state) {
     case "off":
       addStyles(
@@ -771,7 +893,6 @@ const changeSidebarSetting = (sidebarSelector, state, onAdd) => {
 
     case "on":
       removeStyles(sidebarSelector);
-      onAdd?.();
       break;
   }
 };
@@ -779,13 +900,6 @@ const changeSidebarSetting = (sidebarSelector, state, onAdd) => {
 // Functions
 
 const changeSidebarLogo = (state) => changeSidebarSetting("logo", state);
-const changeHomeButton = (state) => changeSidebarSetting("home", state);
-const changeExploreButton = (state) => changeSidebarSetting("explore", state);
-const changeNotificationsButton = (state) => changeSidebarSetting("notifications", state);
-const changeMessagesButton = (state) => changeSidebarSetting("messages", state);
-const changeBookmarksButton = (state) => changeSidebarSetting("bookmarks", state);
-const changeJobsButton = (state) => changeSidebarSetting("jobs", state);
-const changeCreatorStudioButton = (state) => changeSidebarSetting("creatorStudio", state);
 const changeAccountSwitcherButton = (state) => {
   switch (state) {
     case "off":
@@ -802,15 +916,6 @@ const changeAccountSwitcherButton = (state) => {
       break;
   }
 };
-const changeArticlesButton = (state) => changeSidebarSetting("articles", state);
-const changeVerifiedOrgsButton = (state) => changeSidebarSetting("verifiedOrgs", state);
-const changeProfileButton = (state) => changeSidebarSetting("profile", state);
-const changeXPremiumButton = (state) => changeSidebarSetting("xPremium", state, addXPremiumButton);
-const changeGrokButton = (state) => changeSidebarSetting("grok", state);
-const changeTopicsButton = (state) => changeSidebarSetting("topics", state, addTopicsButton);
-const changeCommunitiesButton = (state) => changeSidebarSetting("communities", state, addCommunitiesButton);
-const changeListsButton = (state) => changeSidebarSetting("lists", state, addListsButton);
-const changeAnalyticsButton = (state) => changeSidebarSetting("analytics", state, addAnalyticsButton);
 
 let tm1;
 const addXPremiumButton = () => {
@@ -2209,23 +2314,13 @@ const staticFeatures = {
     changeTweetButton(data[KeyTweetButton]);
   },
   sidebar: (data) => {
-    changeHomeButton(data[KeyHomeButton]);
-    changeExploreButton(data[KeyExploreButton]);
-    changeNotificationsButton(data[KeyNotificationsButton]);
-    changeMessagesButton(data[KeyMessagesButton]);
-    changeBookmarksButton(data[KeyBookmarksButton]);
-    changeJobsButton(data[KeyJobsButton]);
-    changeCreatorStudioButton(data[KeyCreatorStudioButton]);
+    applySidebarWhitelist(data);
     changeAccountSwitcherButton(data[KeyAccountSwitcherButton]);
-    changeArticlesButton(data[KeyArticlesButton]);
-    changeCommunitiesButton(data[KeyCommunitiesButton]);
-    changeTopicsButton(data[KeyTopicsButton]);
-    changeListsButton(data[KeyListsButton]);
-    changeProfileButton(data[KeyProfileButton]);
-    changeXPremiumButton(data[KeyXPremiumButton]);
-    changeGrokButton(data[KeyGrokButton]);
-    changeVerifiedOrgsButton(data[KeyVerifiedOrgsButton]);
-    changeAnalyticsButton(data[KeyTypefullyGrowTab]);
+    if (data[KeyCommunitiesButton] === "on") addCommunitiesButton();
+    if (data[KeyTopicsButton] === "on") addTopicsButton();
+    if (data[KeyListsButton] === "on") addListsButton();
+    if (data[KeyXPremiumButton] === "on") addXPremiumButton();
+    if (data[KeyTypefullyGrowTab] === "on") addAnalyticsButton();
   },
   advanced: (data) => {
     changeCustomCss(data[KeyCustomCss]);
@@ -2742,6 +2837,7 @@ function constructNewData(changes) {
 
 // Listen to settings changes
 chrome.storage.onChanged.addListener(async (changes) => {
+  if (!allSettingsKeys.some((key) => key in changes)) return;
   if (changes[KeyExtensionStatus]?.newValue !== changes[KeyExtensionStatus]?.oldValue) {
     window.location.reload();
     return;

@@ -30,6 +30,7 @@ import { SegmentedControl } from "../ui/SegmentedControl";
 
 import useStorageKeyState from "../../utilities/useStorageKeyState";
 import NavigationHorizontalOffsetControl from "../controls/NavigationHorizontalOffsetControl";
+import SidebarIconList from "../controls/SidebarIconList";
 import Separator from "../ui/Separator";
 import SwitchControl from "../ui/SwitchControl";
 
@@ -116,9 +117,9 @@ const Articles = () => (
     ></path>
     <path
       className="fill-current"
-      clip-rule="evenodd"
+      clipRule="evenodd"
       d="M18.75 9.086l4.414 4.414-8.5 8.5H10.25v-4.414l8.5-8.5zm1.586 4.414l-1.586-1.586L17.664 13l1.586 1.586 1.086-1.086zm-8.086 4.914l4-4L17.836 16l-4 4H12.25v-1.586z"
-      fill-rule="evenodd"
+      fillRule="evenodd"
     ></path>
   </IconButton>
 );
@@ -219,7 +220,7 @@ const NavigationSection = () => {
       <SectionLabel htmlFor="user-control-navigation">左侧导航</SectionLabel>
       <div id="user-control-navigation">
         <form className="p-3 pb-4 dark:bg-x-bgTwoDark bg-x-bgTwo rounded-2xl">
-          <div className="grid grid-cols-5 pb-4 gap-y-2 gap-x-4 mx-auto flex-wrap">
+          <SidebarIconList fallback={<>
             <Home />
             <Explore />
             <Notifications />
@@ -236,7 +237,7 @@ const NavigationSection = () => {
             <VerifiedOrgs />
             <TypefullyGrow />
             <Profile />
-          </div>
+          </>} />
           <div className="flex flex-col gap-y-4">
             <Separator />
             <SwitchControl label="𝕏 标志" storageKey={KeySidebarLogo} />

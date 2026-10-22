@@ -18,6 +18,7 @@ import { getStorage } from "./modules/utilities/storage";
 
 // Listen to settings changes
 chrome.storage.onChanged.addListener(async (changes) => {
+  if (!allSettingsKeys.some((key) => key in changes)) return;
   if (changes[KeyExtensionStatus]?.newValue !== changes[KeyExtensionStatus]?.oldValue) {
     window.location.reload();
     return;

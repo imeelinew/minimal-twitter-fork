@@ -6,7 +6,7 @@ import { addSidebarButton } from "../utilities/sidebar";
 
 // Utilities
 
-export const changeSidebarSetting = (sidebarSelector, state, onAdd) => {
+export const changeSidebarSetting = (sidebarSelector, state) => {
   switch (state) {
     case "off":
       addStyles(
@@ -19,7 +19,6 @@ export const changeSidebarSetting = (sidebarSelector, state, onAdd) => {
 
     case "on":
       removeStyles(sidebarSelector);
-      onAdd?.();
       break;
   }
 };
@@ -27,13 +26,6 @@ export const changeSidebarSetting = (sidebarSelector, state, onAdd) => {
 // Functions
 
 export const changeSidebarLogo = (state) => changeSidebarSetting("logo", state);
-export const changeHomeButton = (state) => changeSidebarSetting("home", state);
-export const changeExploreButton = (state) => changeSidebarSetting("explore", state);
-export const changeNotificationsButton = (state) => changeSidebarSetting("notifications", state);
-export const changeMessagesButton = (state) => changeSidebarSetting("messages", state);
-export const changeBookmarksButton = (state) => changeSidebarSetting("bookmarks", state);
-export const changeJobsButton = (state) => changeSidebarSetting("jobs", state);
-export const changeCreatorStudioButton = (state) => changeSidebarSetting("creatorStudio", state);
 export const changeAccountSwitcherButton = (state) => {
   switch (state) {
     case "off":
@@ -50,15 +42,6 @@ export const changeAccountSwitcherButton = (state) => {
       break;
   }
 };
-export const changeArticlesButton = (state) => changeSidebarSetting("articles", state);
-export const changeVerifiedOrgsButton = (state) => changeSidebarSetting("verifiedOrgs", state);
-export const changeProfileButton = (state) => changeSidebarSetting("profile", state);
-export const changeXPremiumButton = (state) => changeSidebarSetting("xPremium", state, addXPremiumButton);
-export const changeGrokButton = (state) => changeSidebarSetting("grok", state);
-export const changeTopicsButton = (state) => changeSidebarSetting("topics", state, addTopicsButton);
-export const changeCommunitiesButton = (state) => changeSidebarSetting("communities", state, addCommunitiesButton);
-export const changeListsButton = (state) => changeSidebarSetting("lists", state, addListsButton);
-export const changeAnalyticsButton = (state) => changeSidebarSetting("analytics", state, addAnalyticsButton);
 
 let tm1;
 export const addXPremiumButton = () => {

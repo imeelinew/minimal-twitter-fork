@@ -13,7 +13,7 @@ selectors.sidebarLinks = {
   home: `${selectors.leftSidebar} [data-testid="AppTabBar_Home_Link"]`,
   explore: `${selectors.leftSidebar} [data-testid="AppTabBar_Explore_Link"]`,
   notifications: `${selectors.leftSidebar} [data-testid="AppTabBar_Notifications_Link"]`,
-  messages: `${selectors.leftSidebar} [data-testid="AppTabBar_DirectMessage_Link"]`,
+  messages: `${selectors.leftSidebar} [data-testid="AppTabBar_DirectMessage_Link"], ${selectors.leftSidebar} a[href="/i/chat"], ${selectors.leftSidebar} a[href="/messages"]`,
   bookmarks: `${selectors.leftSidebar} a[href*="bookmarks"]`,
   jobs: `${selectors.leftSidebar} a[href*="jobs"]`,
   creatorStudio: [
@@ -31,6 +31,7 @@ selectors.sidebarLinks = {
   verifiedOrgs: `${selectors.leftSidebar} a[href*="verified-orgs"][role="link"][aria-label]`,
   analytics: `${selectors.leftSidebar} .mt-sidebar-button[aria-label="Analytics"]`,
   grok: `${selectors.leftSidebar} a[href*="grok"][role="link"][aria-label]`,
+  more: `${selectors.leftSidebar} [data-testid="AppTabBar_More_Menu"]`,
 };
 selectors.accountSwitcherButton = `[data-testid="SideNav_AccountSwitcher_Button"]`;
 selectors.leftSidebarLabel = `${selectors.leftSidebarLinks} > * > div > div + div:last-child`;
